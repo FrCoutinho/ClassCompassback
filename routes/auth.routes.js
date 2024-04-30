@@ -1,96 +1,68 @@
-cconst express = require('express');
-const router = express.Router();
-const Discipline = require('./models/Discipline');
-const Professor = require('./models/Professor');
+const User = require('../models/User.model')
+const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
+const router = require('express').Router()
+const { isAuthenticated } = require('../middleware/route-guard.middleware')
 
-// Route for creating a new discipline
-router.post('/disciplines', async (req, res) => {
+// POST to signup
+router.post('/signup', async (req, res) => {
+  const { username, password } = req.body
+  const saltRounds = 13
+  const salt = bcrypt.genSaltSync(saltRounds)
+  const hashedPassword = bcrypt.hashSync(password, salt)
+
   try {
-    const discipline = new Discipline(req.body);
-    await discipline.save();
-    res.status(201).send(discipline);
+    const newUser = await User.create({ username, hashedPassword })
+    res.status(201).json(newUser)
   } catch (error) {
-    res.status(400).send(error);
+    console.log(error)
+    if (error.code === 11000) {
+      res.status(400).json({ message: 'Username already in use' })
+    } else {
+      res.status(500).json(error)
+    }
   }
-});
+})
 
-// Route for getting all disciplines
-router.get('/disciplines', async (req, res) => {
+// POST to login
+router.post('/login', async (req, res) => {
+  // Find a user by its username
   try {
-    const disciplines = await Discipline.find();
-    res.send(disciplines);
+    const potentialUser = await User.findOne({ username: req.body.username })
+    if (potentialUser) {
+      //User found
+
+      // Is the password correct ?
+      if (bcrypt.compareSync(req.body.password, potentialUser.hashedPassword)) {
+        // Sign our JWT
+
+        const authToken = jwt.sign(
+          {
+            userId: potentialUser._id,
+          },
+          process.env.TOKEN_SECRET,
+          {
+            algorithm: 'HS256',
+            expiresIn: '6h',
+          }
+        )
+
+        res.status(200).json({ message: 'Password Accepted', token: authToken })
+      } else {
+        res.status(400).json({ message: 'Incorrect password' })
+      }
+    } else {
+      // User not found
+      res.status(400).json({ message: 'user not found' })
+    }
   } catch (error) {
-    res.status(500).send(error);
+    console.log(error)
+    res.status(500).json({ message: 'There is a problem' })
   }
-});
+})
+// GET to verify
+router.get('/verify', isAuthenticated, (req, res) => {
+  res.status(200).json(req.tokenPayload)
+})
 
-// Route for creating a new professor
-router.post('/professors', async (req, res) => {
-  try {
-    const professor = new Professor(req.body);
-    await professor.save();
-    res.status(201).send(professor);
-  } catch (error) {
-    res.status(400).send(error);
-  }
-});
-
-// Route for getting all professors
-router.get('/professors', async (req, res) => {
-  try {
-    const professors = await Professor.find();
-    res.send(professors);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
-
-module.exports = router;
-const express = require('express');
-const router = express.Router();
-const Discipline = require('./models/Discipline');
-const Professor = require('./models/Professor');
-
-// Route for creating a new discipline
-router.post('/disciplines', async (req, res) => {
-  try {
-    const discipline = new Discipline(req.body);
-    await discipline.save();
-    res.status(201).send(discipline);
-  } catch (error) {
-    res.status(400).send(error);
-  }
-});
-
-// Route for getting all disciplines
-router.get('/disciplines', async (req, res) => {
-  try {
-    const disciplines = await Discipline.find();
-    res.send(disciplines);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
-
-// Route for creating a new professor
-router.post('/professors', async (req, res) => {
-  try {
-    const professor = new Professor(req.body);
-    await professor.save();
-    res.status(201).send(professor);
-  } catch (error) {
-    res.status(400).send(error);
-  }
-});
-
-// Route for getting all professors
-router.get('/professors', async (req, res) => {
-  try {
-    const professors = await Professor.find();
-    res.send(professors);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
-
-module.exports = router;
+module.exports = router
