@@ -25,6 +25,10 @@ const professorSchema = new Schema({
     unique: true,
     required: true,
   },
+  hashedPassword: {
+    type: String,
+    required: true,
+  }
 }, {
   timestamps: true
 });

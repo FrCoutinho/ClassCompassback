@@ -1,0 +1,75 @@
+const Professor = require('../models/Professor.model') // Suponha que exista um modelo Professor
+const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
+const router = require('express').Router()
+const { isAuthenticated } = require('../middleware/route-guard.middleware')
+
+// POST to signup for professors
+router.post('/professor/signup', async (req, res) => {
+  const { username, password, subject } = req.body // Suponha que o professor tenha um campo "subject"
+
+  // Hash da senha
+  const saltRounds = 13
+  const salt = bcrypt.genSaltSync(saltRounds)
+  const hashedPassword = bcrypt.hashSync(password, salt)
+
+  try {
+    // Criar um novo professor
+    const newProfessor = await Professor.create({ username, hashedPassword, subject })
+    res.status(201).json(newProfessor)
+  } catch (error) {
+    console.log(error)
+    if (error.code === 11000) {
+      res.status(400).json({ message: 'Username already in use' })
+    } else {
+      res.status(500).json(error)
+    }
+  }
+})
+
+// POST para login de professores
+router.post('/professor/login', async (req, res) => {
+  // Encontrar um professor pelo username
+  try {
+    const potentialProfessor = await Professor.findOne({ username: req.body.username })
+    if (potentialProfessor) {
+      // Professor encontrado
+      // Verificar se a senha está correta
+      if (bcrypt.compareSync(req.body.password, potentialProfessor.hashedPassword)) {
+        // Assinar o JWT
+        const authToken = jwt.sign(
+          {
+            userId: potentialProfessor._id,
+            role: 'professor' // Adicionando o papel do usuário como professor
+          },
+          process.env.TOKEN_SECRET,
+          {
+            algorithm: 'HS256',
+            expiresIn: '6h',
+          }
+        )
+        res.status(200).json({ message: 'Password Accepted', token: authToken })
+      } else {
+        res.status(400).json({ message: 'Incorrect password' })
+      }
+    } else {
+      // Professor não encontrado
+      res.status(400).json({ message: 'Professor not found' })
+    }
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ message: 'There is a problem' })
+  }
+})
+
+// GET para verificar professor logado
+router.get('/professor/verify', isAuthenticated, (req, res) => {
+  // Verificar se o usuário é um professor
+  if (req.tokenPayload.role === 'professor') {
+    res.status(200).json(req.tokenPayload)
+  } else {
+    res.status(403).json({ message: 'Forbidden' })
+  }
+})
+
+module.exports = router

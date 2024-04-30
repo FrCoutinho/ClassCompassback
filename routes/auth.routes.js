@@ -26,6 +26,7 @@ router.post('/signup', async (req, res) => {
 
 // POST to login
 router.post('/login', async (req, res) => {
+    console.log(req.body)
   // Find a user by its username
   try {
     const potentialUser = await User.findOne({ username: req.body.username })
@@ -66,3 +67,4 @@ router.get('/verify', isAuthenticated, (req, res) => {
 })
 
 module.exports = router
+
