@@ -1,18 +1,23 @@
 const { Schema, model } = require('mongoose');
 
 const professorSchema = new Schema ({
-  professorname: {
+   name: {
     type: String,
     required: true,
     unique: true,
     trim: true,
   },
+  
   subject: {
     type: String,
     required: true,
     trim: true,
+  }
+  classes_taught: {
+    type: String,
+    required: true,
   },
-  contact: {
+  experience_years: {
     type: Number,
     required: true,
     trim: true,
@@ -22,10 +27,7 @@ const professorSchema = new Schema ({
     unique: true, 
     required: true,
   },
-  disciplines: {
-    type: String,
-    required: true,
-  }
+  
 }, {
   timestamps: true
 });
