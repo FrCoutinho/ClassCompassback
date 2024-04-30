@@ -17,7 +17,12 @@ router.get('/professors', async (req, res) => {
     const professors = await Professor.find();
     res.send(professors);
   } catch (error) {
-    res.status(500).send(error);
+    if (error instanceof SyntaxError && error.status === 400 && 'body' in error) {
+      // JSON parsing error
+      res.status(400).send({ message: 'Invalid JSON data in request body' });
+    } else {
+      res.status(500).send({ message: 'Internal Server Error' });
+    }
   }
 });
 
