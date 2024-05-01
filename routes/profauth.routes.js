@@ -1,4 +1,4 @@
-const Professor = require('../models/Professor.model') // Suponha que exista um modelo Professor
+const Professor = require('../models/Professor.model') 
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const router = require('express').Router()
@@ -6,9 +6,9 @@ const { isAuthenticated } = require('../middleware/route-guard.middleware')
 
 // POST to signup for professors
 router.post('/professor/signup', async (req, res) => {
-  const { username, password, subject } = req.body // Suponha que o professor tenha um campo "subject"
+  const { username, password, subject } = req.body 
 
-  // Hash da senha
+  // Hash de password
   const saltRounds = 13
   const salt = bcrypt.genSaltSync(saltRounds)
   const hashedPassword = bcrypt.hashSync(password, salt)
@@ -27,16 +27,16 @@ router.post('/professor/signup', async (req, res) => {
   }
 })
 
-// POST para login de professores
+// POST para login de professors
 router.post('/professor/login', async (req, res) => {
-  // Encontrar um professor pelo username
+  // Found professor by username
   try {
     const potentialProfessor = await Professor.findOne({ username: req.body.username })
     if (potentialProfessor) {
-      // Professor encontrado
-      // Verificar se a senha está correta
+      // Professor found
+      // Is the password correct ?
       if (bcrypt.compareSync(req.body.password, potentialProfessor.hashedPassword)) {
-        // Assinar o JWT
+       // Sign our JWT
         const authToken = jwt.sign(
           {
             userId: potentialProfessor._id,
@@ -53,7 +53,7 @@ router.post('/professor/login', async (req, res) => {
         res.status(400).json({ message: 'Incorrect password' })
       }
     } else {
-      // Professor não encontrado
+       // Professor not found
       res.status(400).json({ message: 'Professor not found' })
     }
   } catch (error) {
@@ -62,9 +62,9 @@ router.post('/professor/login', async (req, res) => {
   }
 })
 
-// GET para verificar professor logado
+// GET to verify
 router.get('/professor/verify', isAuthenticated, (req, res) => {
-  // Verificar se o usuário é um professor
+  // Verify the user us a Professor
   if (req.tokenPayload.role === 'professor') {
     res.status(200).json(req.tokenPayload)
   } else {
