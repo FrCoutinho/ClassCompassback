@@ -1,35 +1,35 @@
-const User = require('../models/User.model')
-const bcrypt = require('bcryptjs')
-const jwt = require('jsonwebtoken')
-const router = require('express').Router()
-const { isAuthenticated } = require('../middleware/route-guard.middleware')
+const User = require("../models/User.model");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const router = require("express").Router();
+const { isAuthenticated } = require("../middleware/route-guard.middleware");
 
 // POST to signup
-router.post('/signup', async (req, res) => {
-  const { username, password } = req.body
-  const saltRounds = 13
-  const salt = bcrypt.genSaltSync(saltRounds)
-  const hashedPassword = bcrypt.hashSync(password, salt)
+router.post("/signup", async (req, res) => {
+  const { username, password } = req.body;
+  const saltRounds = 13;
+  const salt = bcrypt.genSaltSync(saltRounds);
+  const hashedPassword = bcrypt.hashSync(password, salt);
 
   try {
-    const newUser = await User.create({ username, hashedPassword })
-    res.status(201).json(newUser)
+    const newUser = await User.create({ username, hashedPassword });
+    res.status(201).json(newUser);
   } catch (error) {
-    console.log(error)
+    console.log(error);
     if (error.code === 11000) {
-      res.status(400).json({ message: 'Username already in use' })
+      res.status(400).json({ message: "Username already in use" });
     } else {
-      res.status(500).json(error)
+      res.status(500).json(error);
     }
   }
-})
+});
 
 // POST to login
-router.post('/login', async (req, res) => {
-    console.log(req.body)
+router.post("/login", async (req, res) => {
+  console.log(req.body);
   // Find a user by its username
   try {
-    const potentialUser = await User.findOne({ username: req.body.username })
+    const potentialUser = await User.findOne({ username: req.body.username });
     if (potentialUser) {
       //User found
 
@@ -43,28 +43,29 @@ router.post('/login', async (req, res) => {
           },
           process.env.TOKEN_SECRET,
           {
-            algorithm: 'HS256',
-            expiresIn: '6h',
+            algorithm: "HS256",
+            expiresIn: "6h",
           }
-        )
+        );
 
-        res.status(200).json({ message: 'Password Accepted', token: authToken })
+        res
+          .status(200)
+          .json({ message: "Password Accepted", token: authToken });
       } else {
-        res.status(400).json({ message: 'Incorrect password' })
+        res.status(400).json({ message: "Incorrect password" });
       }
     } else {
       // User not found
-      res.status(400).json({ message: 'user not found' })
+      res.status(400).json({ message: "user not found" });
     }
   } catch (error) {
-    console.log(error)
-    res.status(500).json({ message: 'There is a problem' })
+    console.log(error);
+    res.status(500).json({ message: "There is a problem" });
   }
-})
+});
 // GET to verify
-router.get('/verify', isAuthenticated, (req, res) => {
-  res.status(200).json(req.tokenPayload)
-})
+router.get("/verify", isAuthenticated, (req, res) => {
+  res.status(200).json(req.tokenPayload);
+});
 
-module.exports = router
-
+module.exports = router;
