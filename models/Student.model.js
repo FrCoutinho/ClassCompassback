@@ -1,6 +1,6 @@
 const { Schema, model } = require("mongoose");
 
-const professorSchema = new Schema(
+const studentSchema = new Schema(
   {
     name: {
       type: String,
@@ -8,18 +8,17 @@ const professorSchema = new Schema(
       unique: true,
       trim: true,
     },
-    subject: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    experience_years: {
+    age: {
       type: Number,
       required: true,
     },
     email: {
       type: String,
       unique: true,
+      required: true,
+    },
+    hashedPassword: {
+      type: String,
       required: true,
     },
     classes: [
@@ -34,6 +33,6 @@ const professorSchema = new Schema(
   }
 );
 
-const Professor = model("Professor", professorSchema);
+const Student = model("Student", studentSchema);
 
-module.exports = Professor;
+module.exports = Student;
