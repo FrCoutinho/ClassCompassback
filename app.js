@@ -24,6 +24,12 @@ app.use("/professor", professorRoutes);
 const professorauthRoutes = require("./routes/profauth.routes");
 app.use("/authprof", professorauthRoutes);
 
+const studentRoutes = require("./routes/student.routes");
+app.use("/student", studentRoutes);
+
+const classRoutes = require("./routes/class.routes");
+app.use("/class", classRoutes);
+
 // ❗ To handle errors. Routes that don't exist or errors that you handle in specific routes
 require("./error-handling")(app);
 

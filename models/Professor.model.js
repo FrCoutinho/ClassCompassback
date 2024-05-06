@@ -22,6 +22,15 @@ const professorSchema = new Schema(
       unique: true,
       required: true,
     },
+    photo: {
+      data: Buffer,
+      contentType: String,
+    },
+    hashedPassword: {
+      type: String,
+      required: false,
+    },
+
     classes: [
       {
         type: Schema.Types.ObjectId,

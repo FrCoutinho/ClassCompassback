@@ -17,9 +17,10 @@ const studentSchema = new Schema(
       unique: true,
       required: true,
     },
-    hashedPassword: {
-      type: String,
-      required: true,
+
+    photo: {
+      data: Buffer,
+      contentType: String,
     },
     classes: [
       {
