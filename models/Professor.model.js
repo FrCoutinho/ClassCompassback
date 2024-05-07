@@ -23,7 +23,7 @@ const professorSchema = new Schema(
       required: true,
     },
     photo: {
-      Type: String,
+      type: String,
     },
 
     classes: [
