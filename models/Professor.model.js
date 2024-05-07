@@ -23,12 +23,7 @@ const professorSchema = new Schema(
       required: true,
     },
     photo: {
-      data: Buffer,
-      contentType: String,
-    },
-    hashedPassword: {
-      type: String,
-      required: false,
+      Type: String,
     },
 
     classes: [

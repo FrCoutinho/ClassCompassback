@@ -6,18 +6,13 @@ const { isAuthenticated } = require("../middleware/route-guard.middleware");
 
 // POST to signup for professors
 router.post("/signup", async (req, res) => {
+  console.log(req.body);
   const { name, password, subject, email, experience_years } = req.body;
-
-  // Hash de password
-  const saltRounds = 13;
-  const salt = bcrypt.genSaltSync(saltRounds);
-  const hashedPassword = bcrypt.hashSync(password, salt);
 
   try {
     // Criar um novo professor
     const newProfessor = await Professor.create({
       name,
-      hashedPassword,
       subject,
       email,
       experience_years,
