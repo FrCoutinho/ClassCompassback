@@ -24,7 +24,7 @@ const studentSchema = new Schema(
     },
     classes: [
       {
-        type: Schema.Types.ObjectId,
+        type: String,
         ref: "Class",
       },
     ],

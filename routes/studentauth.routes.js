@@ -1,54 +1,54 @@
-const Professor = require("../models/Professor.model");
+const Student = require("../models/Student.model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const router = require("express").Router();
 const { isAuthenticated } = require("../middleware/route-guard.middleware");
 const uploader = require("../middleware/cloudinary.config.js");
 
-// POST to signup for professors
+// POST para cadastro de estudantes
 router.post("/signup", uploader.single("photo"), async (req, res) => {
   console.log(req.body);
-  const { name, subject, email, experience_years } = req.body;
+  const { name, age, email, classes } = req.body;
   const photo = req.file.path;
 
   try {
-    // Criar um novo professor
-    const newProfessor = await Professor.create({
+    // Criar um novo estudante
+    const newStudent = await Student.create({
       name,
-      subject,
+      age,
       email,
-      experience_years,
       photo,
+      classes,
     });
-    res.status(201).json(newProfessor);
+    res.status(201).json(newStudent);
   } catch (error) {
     console.log(error);
     if (error.code === 11000) {
-      res.status(400).json({ message: "Username already in use" });
+      res.status(400).json({ message: "Email already in use" });
     } else {
       res.status(500).json(error);
     }
   }
 });
 
-// POST para login de professors
+// POST para login de estudantes
 router.post("/login", async (req, res) => {
-  // Found professor by username
+  // Encontrar estudante por email
   try {
-    const potentialProfessor = await Professor.findOne({
-      username: req.body.username,
+    const potentialStudent = await Student.findOne({
+      email: req.body.email,
     });
-    if (potentialProfessor) {
-      // Professor found
-      // Is the password correct ?
+    if (potentialStudent) {
+      // Estudante encontrado
+      // A senha está correta?
       if (
-        bcrypt.compareSync(req.body.password, potentialProfessor.hashedPassword)
+        bcrypt.compareSync(req.body.password, potentialStudent.hashedPassword)
       ) {
-        // Sign our JWT
+        // Assinar nosso JWT
         const authToken = jwt.sign(
           {
-            userId: potentialProfessor._id,
-            role: "professor", // Adicionando o papel do usuário como professor
+            userId: potentialStudent._id,
+            role: "student", // Adicionando o papel do usuário como estudante
           },
           process.env.TOKEN_SECRET,
           {
@@ -63,8 +63,8 @@ router.post("/login", async (req, res) => {
         res.status(400).json({ message: "Incorrect password" });
       }
     } else {
-      // Professor not found
-      res.status(400).json({ message: "Professor not found" });
+      // Estudante não encontrado
+      res.status(400).json({ message: "Student not found" });
     }
   } catch (error) {
     console.log(error);
@@ -72,10 +72,10 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// GET to verify
+// GET para verificação
 router.get("/verify", isAuthenticated, (req, res) => {
-  // Verify the user us a Professor
-  if (req.tokenPayload.role === "professor") {
+  // Verificar se o usuário é um Estudante
+  if (req.tokenPayload.role === "student") {
     res.status(200).json(req.tokenPayload);
   } else {
     res.status(403).json({ message: "Forbidden" });

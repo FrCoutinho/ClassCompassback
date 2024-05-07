@@ -27,6 +27,9 @@ app.use("/authprof", professorauthRoutes);
 const studentRoutes = require("./routes/student.routes");
 app.use("/student", studentRoutes);
 
+const studentauthRoutes = require("./routes/studentauth.routes");
+app.use("/authstud", studentauthRoutes);
+
 const classRoutes = require("./routes/class.routes");
 app.use("/class", classRoutes);
 
