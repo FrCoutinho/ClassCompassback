@@ -17,7 +17,7 @@ router.post("/students", async (req, res) => {
 router.get("/students", async (req, res) => {
   try {
     const students = await Student.find();
-    res.send(students);
+    res.json(students);
   } catch (error) {
     if (
       error instanceof SyntaxError &&
@@ -25,10 +25,21 @@ router.get("/students", async (req, res) => {
       "body" in error
     ) {
       // JSON parsing error
-      res.status(400).send({ message: "Invalid JSON data in request body" });
+      res.status(400).json({ message: "Invalid JSON data in request body" });
     } else {
-      res.status(500).send({ message: "Internal Server Error" });
+      res.status(500).json({ message: "Internal Server Error" });
     }
+  }
+});
+
+router.get("/:studentId", async (req, res) => {
+  const { studentId } = req.params;
+  try {
+    const student = await Student.findById(studentId);
+    res.json(student);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 });
 

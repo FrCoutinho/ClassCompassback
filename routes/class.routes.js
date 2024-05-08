@@ -16,7 +16,7 @@ router.post("/classes", async (req, res) => {
 router.get("/classes", async (req, res) => {
   try {
     const classes = await Class.find();
-    res.send(classes);
+    res.json(classes);
   } catch (error) {
     if (
       error instanceof SyntaxError &&
@@ -24,9 +24,9 @@ router.get("/classes", async (req, res) => {
       "body" in error
     ) {
       // JSON parsing error
-      res.status(400).send({ message: "Invalid JSON data in request body" });
+      res.status(400).json({ message: "Invalid JSON data in request body" });
     } else {
-      res.status(500).send({ message: "Internal Server Error" });
+      res.status(500).json({ message: "Internal Server Error" });
     }
   }
 });

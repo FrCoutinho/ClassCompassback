@@ -5,7 +5,7 @@ const router = express.Router();
 // Route to get all classes
 router.get("/", async (req, res) => {
   try {
-    const classes = await Class.find();
+    const classes = await Class.find().populate("professor student");
     res.json(classes);
   } catch (err) {
     res.status(500).json({ message: err.message });
