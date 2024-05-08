@@ -48,7 +48,7 @@ router.post("/login", async (req, res) => {
         const authToken = jwt.sign(
           {
             userId: potentialProfessor._id,
-            role: "professor", // Adicionando o papel do usuário como professor
+            role: "professor",
           },
           process.env.TOKEN_SECRET,
           {

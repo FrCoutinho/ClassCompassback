@@ -2,11 +2,13 @@ const { Schema, model, mongoose } = require("mongoose");
 
 const classSchema = new Schema(
   {
-    student: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Student",
-      required: true,
-    },
+    student: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Student",
+        required: true,
+      },
+    ],
     professor: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Professor",
