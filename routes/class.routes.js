@@ -31,4 +31,29 @@ router.get("/classes", async (req, res) => {
   }
 });
 
+//Delete Class
+
+router.delete("/classes/:id", async (req, res) => {
+  try {
+    const classId = req.params.id;
+    await Class.findByIdAndDelete(classId);
+    res.status(201).send();
+  } catch (error) {
+    console.log("Could not find class with id", id);
+    res.status(500).json(error);
+  }
+});
+
+//Update Class
+
+router.put("/classes/:id", async (req, res) => {
+  const classId = req.params.id;
+  try {
+    await Class.findByIdAndUpdate(classId, { new: true });
+    res.status(200).json();
+  } catch (error) {
+    console.log("Could not find class with id", id);
+    res.status(500).json(error);
+  }
+});
 module.exports = router;
