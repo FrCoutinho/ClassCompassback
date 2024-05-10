@@ -43,14 +43,25 @@ router.delete("/professors/:id", async (req, res) => {
   }
 });
 
+router.get("/professors/:id", async (req, res) => {
+  const id = req.params.id;
+  try {
+    const professor = await Professor.findById(id);
+    res.json(professor);
+  } catch (error) {
+    console.log("Could not find teacher with id", ids);
+    res.status(500).json(error);
+  }
+});
+
 // Update Professor
-router.put("/professors", async (req, res) => {
+router.put("/professors/:id", async (req, res) => {
   const teacherId = req.params.id;
   try {
-    const updatedprofessors = await Professor.findByIdAndUpdate(teacherId, {
+    const updatedProfessor = await Professor.findByIdAndUpdate(teacherId, {
       new: true,
     });
-    res.status(200).json(updatedprofessors);
+    res.status(200).json(updatedProfessor);
   } catch (error) {
     console.log(error);
     res.status(500).json(error);
