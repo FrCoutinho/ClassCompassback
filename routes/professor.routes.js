@@ -58,13 +58,20 @@ router.get("/professors/:id", async (req, res) => {
 router.put("/professors/:id", async (req, res) => {
   const teacherId = req.params.id;
   try {
-    const updatedProfessor = await Professor.findByIdAndUpdate(teacherId, {
-      new: true,
-    });
+    const updatedProfessor = await Professor.findByIdAndUpdate(
+      teacherId,
+      req.body,
+      {
+        new: true,
+      }
+    );
+    if (!updatedProfessor) {
+      return res.status(404).json({ message: "Professor not found" });
+    }
     res.status(200).json(updatedProfessor);
   } catch (error) {
-    console.log(error);
-    res.status(500).json(error);
+    console.log("Error updating professor:", error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 });
 
